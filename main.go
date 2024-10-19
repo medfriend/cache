@@ -7,6 +7,8 @@ import (
 	"cache-go/redis"
 	"context"
 	"fmt"
+	"log"
+	"net/http"
 )
 
 var ctx = context.Background()
@@ -20,4 +22,6 @@ func main() {
 	fmt.Println(cacheHandler.GetData("test"))
 
 	httpServer.InitHttpServer()
+
+	log.Fatal(http.ListenAndServe(":8090", nil))
 }
