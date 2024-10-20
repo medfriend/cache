@@ -5,10 +5,11 @@ import (
 	"cache-go/redis"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"os"
 )
 
-func InitHttpServer(cacheClient *redis.CacheProxy) {
+func InitHttpServer(cacheClient *redis.CacheProxy, taskQueue chan *http.Request) {
 
 	path := fmt.Sprintf("/%s/*path", os.Getenv("SERVICE_PATH"))
 
@@ -17,7 +18,9 @@ func InitHttpServer(cacheClient *redis.CacheProxy) {
 	r := gin.Default()
 
 	r.Any(path, func(c *gin.Context) {
+
 		c.Header("Content-Type", "application/json")
+		taskQueue <- c.Request
 
 		switch c.Request.Method {
 		case "GET":

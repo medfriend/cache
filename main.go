@@ -1,19 +1,32 @@
 package main
 
 import (
-	"cache-go/consul"
-	"cache-go/env"
 	"cache-go/httpServer"
 	"cache-go/redis"
-	"context"
+	"cache-go/util/consul"
+	"cache-go/util/env"
+	"cache-go/util/worker"
+	"fmt"
+	"net/http"
+	"runtime"
 )
-
-var ctx = context.Background()
 
 func main() {
 	env.LoadEnv()
-	consul.ConnectToConsul()
+	consulClient := consul.ConnectToConsul()
 
-	httpServer.InitHttpServer(redis.NewCacheProxy())
+	numCPUs := runtime.NumCPU()
+
+	fmt.Printf("Detected %d CPUs, creating %d workers\n", numCPUs, numCPUs)
+
+	taskQueue := make(chan *http.Request, 100)
+
+	stop := make(chan struct{})
+
+	worker.CreateWorkers(numCPUs, stop, taskQueue)
+
+	go httpServer.InitHttpServer(redis.NewCacheProxy(), taskQueue)
+
+	worker.HandleShutdown(stop, consulClient)
 
 }
