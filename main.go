@@ -3,10 +3,10 @@ package main
 import (
 	"cache-go/httpServer"
 	"cache-go/redis"
-	"cache-go/util/consul"
-	"cache-go/util/env"
-	"cache-go/util/worker"
 	"fmt"
+	"github.com/medfriend/shared-commons-go/util/consul"
+	"github.com/medfriend/shared-commons-go/util/env"
+	"github.com/medfriend/shared-commons-go/util/worker"
 	"net/http"
 	"runtime"
 )
