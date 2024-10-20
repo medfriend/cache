@@ -2,18 +2,24 @@ package redis
 
 import (
 	"context"
+	"fmt"
 	"github.com/redis/go-redis/v9"
+	"os"
 )
 
 var ctx = context.Background()
 
 var redisClient *redis.Client
 
-// TODO agregar la variables env
 func GetRedisClient() *redis.Client {
+
 	if redisClient == nil {
 		redisClient = redis.NewClient(&redis.Options{
-			Addr:     "localhost:6379",
+			Addr: fmt.Sprintf(
+				"%s:%s",
+				os.Getenv("REDIS_HOST"),
+				os.Getenv("REDIS_PORT"),
+			),
 			Password: "",
 			DB:       0,
 		})
