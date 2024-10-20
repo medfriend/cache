@@ -1,12 +1,14 @@
 package httpServer
 
 import (
+	"cache-go/httpServer/cacheHandler"
+	"cache-go/redis"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"os"
 )
 
-func InitHttpServer() {
+func InitHttpServer(cacheClient *redis.CacheProxy) {
 
 	path := fmt.Sprintf("/%s/*path", os.Getenv("SERVICE_PATH"))
 
@@ -17,10 +19,15 @@ func InitHttpServer() {
 	r.Any(path, func(c *gin.Context) {
 		c.Header("Content-Type", "application/json")
 
-		c.JSON(200, gin.H{
-			"test": "Test",
-		})
+		switch c.Request.Method {
+		case "GET":
+			cacheHandler.GetCache(c, cacheClient)
+		}
 	})
 
-	r.Run(":8090")
+	err := r.Run(":8090")
+
+	if err != nil {
+		return
+	}
 }
