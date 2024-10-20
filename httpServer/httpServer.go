@@ -2,22 +2,25 @@ package httpServer
 
 import (
 	"fmt"
-	"net/http"
+	"github.com/gin-gonic/gin"
 	"os"
 )
 
 func InitHttpServer() {
 
-	path := fmt.Sprintf("/%s/", os.Getenv("SERVICE_PATH"))
+	path := fmt.Sprintf("/%s/*path", os.Getenv("SERVICE_PATH"))
 
 	fmt.Println(path)
 
-	http.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
-		response := `{"test":"Test"}`
+	r := gin.Default()
 
-		w.Header().Set("Content-Type", "application/json")
+	r.Any(path, func(c *gin.Context) {
+		c.Header("Content-Type", "application/json")
 
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(response))
+		c.JSON(200, gin.H{
+			"test": "Test",
+		})
 	})
+
+	r.Run(":8090")
 }
