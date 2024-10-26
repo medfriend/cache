@@ -4,7 +4,8 @@ go 1.23.2
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/medfriend/shared-commons-go v0.0.3
+	github.com/hashicorp/consul/api v1.30.0
+	github.com/medfriend/shared-commons-go v0.0.9
 	github.com/redis/go-redis/v9 v9.7.0
 )
 
@@ -23,7 +24,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/hashicorp/consul/api v1.30.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect

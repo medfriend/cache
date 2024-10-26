@@ -8,12 +8,13 @@ import (
 	"github.com/medfriend/shared-commons-go/util/env"
 	"github.com/medfriend/shared-commons-go/util/worker"
 	"net/http"
+	"os"
 	"runtime"
 )
 
 func main() {
 	env.LoadEnv()
-	consulClient := consul.ConnectToConsul()
+	consulClient := consul.ConnectToConsulKey(os.Getenv("SERVICE_NAME"))
 
 	numCPUs := runtime.NumCPU()
 
@@ -25,7 +26,7 @@ func main() {
 
 	worker.CreateWorkers(numCPUs, stop, taskQueue)
 
-	go httpServer.InitHttpServer(redis.NewCacheProxy(), taskQueue)
+	go httpServer.InitHttpServer(redis.NewCacheProxy(consulClient), taskQueue)
 
 	worker.HandleShutdown(stop, consulClient)
 

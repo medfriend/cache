@@ -2,23 +2,36 @@ package redis
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/consul/api"
+	"github.com/medfriend/shared-commons-go/util/consul"
 	"github.com/redis/go-redis/v9"
-	"os"
+	"log"
 )
 
 var ctx = context.Background()
 
 var redisClient *redis.Client
 
-func GetRedisClient() *redis.Client {
+func GetRedisClient(consulClient *api.Client) *redis.Client {
+
+	cache, _ := consul.GetKeyValue(consulClient, "CACHE")
+
+	var result map[string]string
+
+	err := json.Unmarshal([]byte(cache), &result)
+
+	if err != nil {
+		log.Fatalf("Error converting JSON string to map: %v", err)
+	}
 
 	if redisClient == nil {
 		redisClient = redis.NewClient(&redis.Options{
 			Addr: fmt.Sprintf(
 				"%s:%s",
-				os.Getenv("REDIS_HOST"),
-				os.Getenv("REDIS_PORT"),
+				result["REDIS_HOST"],
+				result["REDIS_PORT"],
 			),
 			Password: "",
 			DB:       0,
@@ -28,8 +41,8 @@ func GetRedisClient() *redis.Client {
 	return redisClient
 }
 
-func NewCacheProxy() *CacheProxy {
-	return &CacheProxy{client: GetRedisClient()}
+func NewCacheProxy(client *api.Client) *CacheProxy {
+	return &CacheProxy{client: GetRedisClient(client)}
 }
 
 func (p *CacheProxy) GetData(key string) (string, error) {
