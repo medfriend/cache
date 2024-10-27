@@ -26,16 +26,25 @@ func GetRedisClient(consulClient *api.Client) *redis.Client {
 		log.Fatalf("Error converting JSON string to map: %v", err)
 	}
 
+	fmt.Println(result)
+
 	if redisClient == nil {
 		redisClient = redis.NewClient(&redis.Options{
 			Addr: fmt.Sprintf(
 				"%s:%s",
-				result["REDIS_HOST"],
+				result["REDIS_ADDRESS"],
 				result["REDIS_PORT"],
 			),
-			Password: "",
+			Password: result["REDIS_PASSWORD"],
 			DB:       0,
 		})
+
+		_, err := redisClient.Ping(ctx).Result()
+		if err != nil {
+			log.Fatalf("No se pudo conectar a Redis: %v", err)
+		} else {
+			log.Println("Conexión exitosa a Redis")
+		}
 	}
 
 	return redisClient
