@@ -8,6 +8,7 @@ import (
 	"github.com/medfriend/shared-commons-go/util/consul"
 	"github.com/redis/go-redis/v9"
 	"log"
+	"time"
 )
 
 var ctx = context.Background()
@@ -63,4 +64,14 @@ func (p *CacheProxy) GetData(key string) (string, error) {
 	}
 
 	return val, nil
+}
+
+func (p *CacheProxy) PostData(ctx context.Context, key string, value string) error {
+	// Almacenar el valor en Redis
+	err := p.client.Set(ctx, key, value, 5*time.Minute).Err()
+	if err != nil {
+		return fmt.Errorf("error al guardar el dato en Redis: %v", err)
+	}
+
+	return nil
 }

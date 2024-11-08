@@ -25,6 +25,8 @@ func InitHttpServer(cacheClient *redis.CacheProxy, taskQueue chan *http.Request)
 		switch c.Request.Method {
 		case "GET":
 			cacheHandler.GetCache(c, cacheClient)
+		case "POST":
+			cacheHandler.PostCache(c, cacheClient)
 		}
 	})
 
