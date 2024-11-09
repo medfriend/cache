@@ -8,6 +8,7 @@ import (
 	"github.com/medfriend/shared-commons-go/util/consul"
 	"github.com/redis/go-redis/v9"
 	"log"
+	"os"
 	"time"
 )
 
@@ -17,7 +18,15 @@ var redisClient *redis.Client
 
 func GetRedisClient(consulClient *api.Client) *redis.Client {
 
-	cache, _ := consul.GetKeyValue(consulClient, "CACHE")
+	var cacheKey string
+
+	if os.Getenv("SERVICE_STATUS") == "LOCAL" {
+		cacheKey = "REDIS_LOCAL"
+	} else {
+		cacheKey = "REDIS"
+	}
+
+	cache, _ := consul.GetKeyValue(consulClient, cacheKey)
 
 	var result map[string]string
 
