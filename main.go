@@ -8,13 +8,12 @@ import (
 	"github.com/medfriend/shared-commons-go/util/env"
 	"github.com/medfriend/shared-commons-go/util/worker"
 	"net/http"
-	"os"
 	"runtime"
 )
 
 func main() {
 	env.LoadEnv()
-	consulClient := consul.ConnectToConsulKey(os.Getenv("SERVICE_NAME"))
+	consulClient := consul.ConnectToConsulKey("", "CACHE")
 
 	numCPUs := runtime.NumCPU()
 
