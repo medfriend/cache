@@ -1,22 +1,41 @@
-FROM golang:1.23
+# Use the official Golang image to create a build artifact.
+FROM golang:1.23.3 as builder
 
-# Establece el directorio de trabajo
-WORKDIR /go/src/app
+# Set the Current Working Directory inside the container
+WORKDIR /app
 
-# Copia el archivo go.mod y go.sum
+# Copy go mod and sum files
 COPY go.mod go.sum ./
 
-# Descarga las dependencias
-RUN go mod tidy
+# Download all dependencies
+RUN go mod download
 
-# Copia el código fuente
+# Copy the source code into the container, incluyendo el .env
 COPY . .
 
-# Compila la aplicación Go
-RUN go build -o app .
+# ✅ Copiar el archivo .env a la misma ubicación donde está main.go
+COPY .env /app/.env
 
-# Expone el puerto en el contenedor
+# Build the Go app
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o myapp
+
+# Start a new stage from scratch
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# Copy the Pre-built binary file from the previous stage
+COPY --from=builder /app/myapp .
+
+# ✅ Copiar el .env en la misma ubicación donde se ejecutará `myapp`
+COPY --from=builder /app/.env .
+
+# ✅ Definir variable de entorno para que la aplicación sepa dónde encontrarlo
+ENV ENV_PATH=/root/.env
+
+# Expose port 8090 to the outside world
 EXPOSE 8090
 
-# Comando para ejecutar la aplicación
-CMD ["./app"]
+# Command to run the executable
+CMD ["./myapp"]

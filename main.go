@@ -13,7 +13,8 @@ import (
 
 func main() {
 	env.LoadEnv()
-	consulClient := consul.ConnectToConsulKey("", "CACHE")
+
+	consulClient := consul.ConnectToConsulKey("172.17.0.1:8500", "CACHE")
 
 	numCPUs := runtime.NumCPU()
 
