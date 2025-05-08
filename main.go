@@ -8,13 +8,17 @@ import (
 	"github.com/medfriend/shared-commons-go/util/env"
 	"github.com/medfriend/shared-commons-go/util/worker"
 	"net/http"
+	"os"
 	"runtime"
 )
 
 func main() {
 	env.LoadEnv()
 
-	consulClient := consul.ConnectToConsulKey("172.17.0.1:8500", "CACHE")
+	consulIp := os.Getenv("CONSUL_IP")
+	consulConn := fmt.Sprint(consulIp, ":8500")
+
+	consulClient := consul.ConnectToConsulKey(consulConn, "CACHE")
 
 	numCPUs := runtime.NumCPU()
 
