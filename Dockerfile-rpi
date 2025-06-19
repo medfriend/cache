@@ -1,0 +1,32 @@
+# Etapa 1: Compilar binario para ARM64
+FROM golang:1.23.3 AS builder
+
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copiar el código fuente y .env
+COPY . .
+COPY .env /app/.env
+
+# Compilar para arquitectura ARM64 (Raspberry Pi)
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o myapp
+
+# Etapa 2: Imagen final en Alpine ARM64
+FROM alpine:3.20
+
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# Copiar binario, .env y configurar variable de entorno
+COPY --from=builder /app/myapp .
+COPY --from=builder /app/.env .
+
+ENV ENV_PATH=/root/.env
+
+EXPOSE 8090
+
+CMD ["./myapp"]
