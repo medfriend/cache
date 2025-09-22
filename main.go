@@ -33,5 +33,4 @@ func main() {
 	go httpServer.InitHttpServer(redis.NewCacheProxy(consulClient), taskQueue)
 
 	worker.HandleShutdown(stop, consulClient)
-
 }
